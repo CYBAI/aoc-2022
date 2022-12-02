@@ -7,7 +7,14 @@ name = "aoc_utils"
 version = "0.1.0"
 
 [[package]]
-name = "rust"
+name = "day01"
+version = "0.1.0"
+dependencies = [
+ "aoc_utils",
+]
+
+[[package]]
+name = "day02"
 version = "0.1.0"
 dependencies = [
  "aoc_utils",
