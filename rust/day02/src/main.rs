@@ -2,21 +2,11 @@ use std::cmp::Ordering;
 
 use aoc_utils::read_file;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 enum Janken {
     Rock,
     Paper,
     Scissor,
-}
-
-impl PartialEq for Janken {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (Janken::Rock, Janken::Rock) => true,
-            (Janken::Paper, Janken::Paper) => true,
-            (Janken::Scissor, Janken::Scissor) => true,
-            _ => false,
-        }
-    }
 }
 
 impl PartialOrd for Janken {
@@ -61,6 +51,22 @@ impl Janken {
             None => panic!("Invalid comparison"),
         }
     }
+
+    fn transform(&self, order: Ordering) -> Self {
+        match order {
+            Ordering::Equal => self.clone(),
+            Ordering::Greater => match self {
+                Janken::Rock => Janken::Paper,
+                Janken::Paper => Janken::Scissor,
+                Janken::Scissor => Janken::Rock,
+            },
+            Ordering::Less => match self {
+                Janken::Rock => Janken::Scissor,
+                Janken::Paper => Janken::Rock,
+                Janken::Scissor => Janken::Paper,
+            },
+        }
+    }
 }
 
 fn main() -> Result<(), ()> {
@@ -68,6 +74,7 @@ fn main() -> Result<(), ()> {
     let lines = parse(input);
 
     println!("Part 1: {}", part1(&lines));
+    println!("Part 2: {}", part2(&lines));
 
     Ok(())
 }
@@ -94,6 +101,24 @@ fn part1(lines: &Vec<Vec<char>>) -> u32 {
                 'Z' => 'C',
                 _ => panic!("Invalid character"),
             });
+
+            me.score() + me.game_score(&other)
+        })
+        .sum()
+}
+
+fn part2(lines: &Vec<Vec<char>>) -> u32 {
+    lines
+        .iter()
+        .map(|chars| {
+            let other = Janken::from(chars[0]);
+            let order = match chars[1] {
+                'X' => Ordering::Less,
+                'Y' => Ordering::Equal,
+                'Z' => Ordering::Greater,
+                _ => panic!("Invalid character"),
+            };
+            let me = other.transform(order);
 
             me.score() + me.game_score(&other)
         })
