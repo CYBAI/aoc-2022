@@ -34,6 +34,7 @@ fn main() -> Result<(), ()> {
     let elfs = parse(input);
 
     println!("Part 1: {}", part1(&elfs));
+    println!("Part 2: {}", part2(&elfs));
 
     Ok(())
 }
@@ -53,6 +54,20 @@ fn part1(elfs: &Vec<String>) -> u64 {
             };
 
             priority(com.common())
+        })
+        .sum()
+}
+
+fn part2(elfs: &Vec<String>) -> u64 {
+    elfs.chunks(3)
+        .map(|win| {
+            let c = win
+                .iter()
+                .map(|elf| elf.chars().collect::<HashSet<_>>())
+                .reduce(|acc, s| acc.intersection(&s).cloned().collect::<HashSet<_>>())
+                .and_then(|s| s.iter().next().cloned());
+
+            priority(c)
         })
         .sum()
 }
