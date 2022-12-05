@@ -91,6 +91,7 @@ fn main() -> Result<(), ()> {
     let crane = Crane::parse(input);
 
     println!("Part 1: {:?}", part1(&crane));
+    println!("Part 2: {:?}", part2(&crane));
 
     Ok(())
 }
@@ -105,6 +106,24 @@ fn part1(crane: &Crane) -> String {
 
         let mut items = board[from].split_off(len.checked_sub(movement.count).unwrap_or(len));
         items.reverse();
+        board[to].append(&mut items);
+    }
+
+    board
+        .iter()
+        .filter_map(|row| row.last())
+        .collect::<String>()
+}
+
+fn part2(crane: &Crane) -> String {
+    let mut board = crane.board.0.clone();
+
+    for movement in &crane.movements {
+        let from = movement.from;
+        let to = movement.to;
+        let len = board[from].len();
+
+        let mut items = board[from].split_off(len.checked_sub(movement.count).unwrap_or(len));
         board[to].append(&mut items);
     }
 
