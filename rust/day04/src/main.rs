@@ -15,6 +15,13 @@ impl ElfPair {
         (left.max <= right.max && left.min >= right.min)
             || (right.max <= left.max && right.min >= left.min)
     }
+
+    fn overlapped(&self) -> bool {
+        let (left, right) = &self.0;
+
+        (left.min <= right.max && left.min >= right.min)
+            || (right.min <= left.max && right.min >= left.min)
+    }
 }
 
 fn main() -> Result<(), ()> {
@@ -22,6 +29,7 @@ fn main() -> Result<(), ()> {
     let pairs = parse(input);
 
     println!("Part 1: {}", part1(&pairs));
+    println!("Part 2: {}", part2(&pairs));
 
     Ok(())
 }
@@ -45,4 +53,8 @@ fn parse(input: String) -> Vec<ElfPair> {
 
 fn part1(pairs: &Vec<ElfPair>) -> usize {
     pairs.iter().filter(|pair| pair.fully_overlap()).count()
+}
+
+fn part2(pairs: &Vec<ElfPair>) -> usize {
+    pairs.iter().filter(|pair| pair.overlapped()).count()
 }
