@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use aoc_utils::read_file;
 
 fn main() -> Result<(), ()> {
@@ -11,23 +9,37 @@ fn main() -> Result<(), ()> {
     Ok(())
 }
 
+fn is_unique(alps: &[u32; 26]) -> bool {
+    alps.iter().all(|n| *n <= 1)
+}
+
 fn find_marker(input: &str, size: usize) -> usize {
-    let chars = input.chars().collect::<Vec<_>>();
+    let mut alps: [u32; 26] = [0; 26];
+    let mut prev = input.chars().nth(0).unwrap();
 
-    chars
-        .windows(size)
-        .enumerate()
-        .find(|(_, chars)| {
-            let mut set: HashSet<&char> = HashSet::new();
+    for c in input.chars().take(size) {
+        alps[c as usize - 97] += 1;
+    }
 
-            for c in chars.iter() {
-                set.insert(c);
-            }
+    if is_unique(&alps) {
+        return size;
+    }
 
-            set.len() == size
-        })
-        .map(|(idx, _)| idx + size)
-        .unwrap_or(0)
+    for (idx, c) in input.chars().enumerate().skip(size) {
+        alps[prev as usize - 97] -= 1;
+        alps[c as usize - 97] += 1;
+
+        if is_unique(&alps) {
+            return idx + 1;
+        }
+
+        match input.chars().nth(idx - size + 1) {
+            Some(c) => prev = c,
+            None => return 0,
+        }
+    }
+
+    0
 }
 
 fn part1(input: &str) -> usize {
