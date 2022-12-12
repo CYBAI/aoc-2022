@@ -7,6 +7,7 @@ fn main() -> Result<(), ()> {
     let grid = parse(input);
 
     println!("Part 1: {}", part1(&grid));
+    println!("Part 2: {}", part2(&grid));
 
     Ok(())
 }
@@ -26,7 +27,61 @@ fn part1(grid: &Vec<Vec<u8>>) -> usize {
     let n = grid.len();
     let m = grid[0].len();
 
-    let count = (n + m) * 2 - 4;
+    (n + m) * 2 - 4 + find_visible_dots(grid).len()
+}
+
+fn part2(grid: &Vec<Vec<u8>>) -> u32 {
+    find_visible_dots(grid)
+        .iter()
+        .map(|coord| calc_scenic_score(*coord, grid))
+        .max()
+        .unwrap_or(0)
+}
+
+fn calc_scenic_score((x, y): (usize, usize), grid: &Vec<Vec<u8>>) -> u32 {
+    let n = grid.len();
+    let m = grid[0].len();
+
+    let curr = grid[x][y];
+
+    let mut left = 0;
+    for j in (0..y).rev() {
+        left += 1;
+        if grid[x][j] >= curr {
+            break;
+        }
+    }
+
+    let mut right = 0;
+    for j in (y + 1)..m {
+        right += 1;
+        if grid[x][j] >= curr {
+            break;
+        }
+    }
+
+    let mut top = 0;
+    for i in (0..x).rev() {
+        top += 1;
+        if grid[i][y] >= curr {
+            break;
+        }
+    }
+
+    let mut bottom = 0;
+    for i in (x + 1)..n {
+        bottom += 1;
+        if grid[i][y] >= curr {
+            break;
+        }
+    }
+
+    left * right * top * bottom
+}
+
+fn find_visible_dots(grid: &Vec<Vec<u8>>) -> HashSet<(usize, usize)> {
+    let n = grid.len();
+    let m = grid[0].len();
 
     let mut visible_dots = HashSet::new();
 
@@ -74,5 +129,5 @@ fn part1(grid: &Vec<Vec<u8>>) -> usize {
         }
     }
 
-    count + visible_dots.len()
+    visible_dots
 }
